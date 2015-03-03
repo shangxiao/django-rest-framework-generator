@@ -31,6 +31,21 @@ class %(model)sViewSet(viewsets.ModelViewSet):
     serializer_class = %(model)sSerializer
 """
 
+urls = """\
+from django.conf.urls import url, include
+from rest_framework import routers
+from . import views
+
+router = routers.DefaultRouter()
+%(router_defs)s
+
+urlpatterns = [
+    url(r'^', include(router.urls)),
+]
+"""
+
+router_def = "router.register(r'%(model_api_name)s', views.%(model)sViewSet)\n"
+
 class Command(BaseCommand):
     args = '<app_name>'
     help = 'Generates serializers and viewsets (with --viewsets) for DRF'
@@ -40,6 +55,11 @@ class Command(BaseCommand):
             dest='viewsets',
             default=False,
             help='Generate viewsets'),
+        make_option('--urls',
+            action='store_true',
+            dest='urls',
+            default=False,
+            help='Generate urls'),
         )
 
     def handle(self, *args, **options):
@@ -48,27 +68,45 @@ class Command(BaseCommand):
 
         app_name = args[0]
         app = get_app(app_name)
-        class_defs = []
         model_names = [model.__name__ for model in get_models(app)]
 
         if options['viewsets']:
             serializer_names = [model_name + 'Serializer' for model_name in model_names]
-
-            for model in get_models(app):
-                class_defs.append(viewset_class_def % {
-                    'model': model.__name__
-                })
+            class_defs = [
+                viewset_class_def % {
+                    'model': name,
+                }
+                for name in model_names
+            ]
 
             print viewsets % {
                 'model_imports': 'from ' + app_name + '.models import ' + (', '.join(model_names)),
                 'serializer_imports': 'from ' + app_name + '.serializers import ' + (', '.join(serializer_names)),
                 'classes': ''.join(class_defs),
             }
+
+        elif options['urls']:
+            view_names = [model_name + 'ViewSet' for model_name in model_names]
+            router_defs = [
+                router_def % {
+                    'model_api_name': model_name.lower() + 's',
+                    'model': model_name,
+                }
+                for model_name in model_names
+            ]
+
+            print urls % {
+                'view_imports': 'from ' + app_name + '.views import ' + (', '.join(view_names)),
+                'router_defs': ''.join(router_defs),
+            }
+
         else:
-            for model in get_models(app):
-                class_defs.append(serializer_class_def % {
-                    'model': model.__name__
-                })
+            class_defs = [
+                serializer_class_def % {
+                    'model': name,
+                }
+                for name in model_names
+            ]
 
             print serializers % {
                 'model_imports': 'from ' + app_name + '.models import ' + (', '.join(model_names)),
