@@ -28,3 +28,7 @@ To generate serializers:
 To generate viewsets:
 
 `python manage.py generate_serializers_views <app_name> --viewsets > <app_dir>/views.py`
+
+To generate urls:
+
+`python manage.py generate_serializers_views <app_name> --urls > <app_dir>/urls.py`
