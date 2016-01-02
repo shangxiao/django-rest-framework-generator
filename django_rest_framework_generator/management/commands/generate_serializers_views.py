@@ -1,6 +1,12 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
-from django.db.models.loading import get_app, get_models
+try:
+    from django.apps import apps
+    get_app = apps.get_app_config
+    from django.apps.registry import AppConfig
+    get_models = AppConfig.get_models
+except ImportError:
+    from django.db.models.loading import get_app, get_models
 
 serializers = """\
 from rest_framework import serializers
