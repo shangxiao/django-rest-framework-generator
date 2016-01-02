@@ -85,11 +85,11 @@ class Command(BaseCommand):
                 for name in model_names
             ]
 
-            print viewsets % {
+            print(viewsets % {
                 'model_imports': 'from ' + app_name + '.models import ' + (', '.join(model_names)),
                 'serializer_imports': 'from ' + app_name + '.serializers import ' + (', '.join(serializer_names)),
                 'classes': ''.join(class_defs),
-            }
+            })
 
         elif options['urls']:
             view_names = [model_name + 'ViewSet' for model_name in model_names]
@@ -101,10 +101,10 @@ class Command(BaseCommand):
                 for model_name in model_names
             ]
 
-            print urls % {
+            print(urls % {
                 'view_imports': 'from ' + app_name + '.views import ' + (', '.join(view_names)),
                 'router_defs': ''.join(router_defs),
-            }
+            })
 
         else:
             class_defs = [
@@ -114,7 +114,7 @@ class Command(BaseCommand):
                 for name in model_names
             ]
 
-            print serializers % {
+            print(serializers % {
                 'model_imports': 'from ' + app_name + '.models import ' + (', '.join(model_names)),
                 'classes': ''.join(class_defs),
-            }
+            })
