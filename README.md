@@ -12,10 +12,10 @@ or in your requirements.txt:
 and in your settings.py add:
 
 ```python
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     # ...
     'django_rest_framework_generator',
-)
+]
 ```
 
 Usage
